@@ -303,3 +303,24 @@ num2words <- function(x) {
   if (length(x) > 1) return(trim(sapply(x, helper)))
   helper(x)
 }
+
+#' Match events to navigation data.
+#'
+#' @param event.date Event date, in POSIXct format.
+#' @param nav.df Data frame containing navigation data from Winfrog.
+#' @return Data frame containing the nearest `nav_id` in time and the time difference (`lag_s`) in seconds.
+#' @export
+nav_match <- function(event.date, nav.df){
+  # Calculate the time difference between i-th event and all nav records
+  time.diff	<- abs(difftime(event.date, nav.df$date_time, units = "secs"))
+  # Return nav_id with nearest in time
+  nav_id	<- nav.df$nav_id[which.min(time.diff)]
+  # Return the time difference for the nearest nav_id
+  lag_s 	<- min(time.diff)
+
+  # Put results into a data frame
+  nav.match.df <- data.frame(nav_id, lag_s)
+
+  # Return results data frame
+  return(nav.match.df)
+}
